@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lo-Fi Café Radio</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+        font-family: Georgia, "Times New Roman", serif;
+    }
+
+    /* =========================
+       RADIO BODY
+       ========================= */
+
+    .radio {
+        width: min(900px, 96vw);
+        background:
+            linear-gradient(
+                90deg,
+                #4b2415,
+                #713d24 8%,
+                #5b2d19 50%,
+                #713d24 92%,
+                #421c11
+            );
+
+        border: 7px solid #2b170f;
+        border-radius: 8px;
+
+        padding: 30px 34px 24px;
+
+        box-shadow:
+            inset 0 0 0 3px #9b6a38,
+            inset 0 0 0 7px #3a1c11,
+            0 18px 35px rgba(0,0,0,.45);
+
+        position: relative;
+    }
+
+    /* Vintage gold lines */
+
+    .radio::before,
+    .radio::after {
+        content: "";
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        height: 2px;
+        background: #b8894e;
+    }
+
+    .radio::before {
+        top: 9px;
+    }
+
+    .radio::after {
+        bottom: 9px;
+    }
+
+    /* =========================
+       SPEAKER / IMAGE AREA
+       ========================= */
+
+    .speaker-frame {
+        padding: 12px;
+        border-radius: 28px 28px 10px 10px;
+
+        background: #3c2115;
+
+        border: 3px solid #c29a5b;
+
+        box-shadow:
+            inset 0 0 0 4px #684127,
+            inset 0 0 0 7px #1d110b;
+    }
+
+    .speaker {
+        height: 290px;
+        position: relative;
+        overflow: hidden;
+
+        border: 4px solid #7f5933;
+
+        background: #bd9b69;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /*
+       IMAGE AREA
+
+       Replace the URL below with your own:
+       JPG / JPEG / PNG / GIF all work.
+
+       Example:
+       background-image: url("cafe.gif");
+    */
+
+    .cafe-image {
+        position: absolute;
+        inset: 0;
+
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        background-image:
+            url("https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb");
+
+        background-size: cover;
+        background-position: center;
+
+        filter: sepia(.35) saturate(.75);
+    }
+
+    /* Speaker grille overlay */
+
+    .speaker::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background-image:
+            repeating-linear-gradient(
+                0deg,
+                rgba(75,43,25,.18) 0px,
+                rgba(75,43,25,.18) 3px,
+                transparent 3px,
+                transparent 8px
+            );
+
+        pointer-events: none;
+    }
+
+    /* Little title over image */
+
+    .radio-title {
+        position: absolute;
+        z-index: 3;
+
+        bottom: 15px;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        padding: 7px 18px;
+
+        background: rgba(35,18,10,.78);
+
+        border: 1px solid #c9a366;
+
+        color: #ead09b;
+
+        font-size: 13px;
+        letter-spacing: 4px;
+
+        white-space: nowrap;
+
+        text-shadow: 1px 1px #000;
+    }
+
+    /* =========================
+       CONTROL PANEL
+       ========================= */
+
+    .panel {
+        margin-top: 8px;
+
+        background:
+            linear-gradient(
+                #211713,
+                #382017 40%,
+                #21130f
+            );
+
+        border: 3px solid #6e4528;
+
+        padding: 13px 15px 9px;
+
+        box-shadow:
+            inset 0 2px 0 #9b6c3d,
+            inset 0 -2px 0 #100b08;
+    }
+
+    .dial-row {
+        display: grid;
+
+        grid-template-columns: 115px 1fr 115px;
+
+        align-items: center;
+
+        gap: 15px;
+    }
+
+    /* =========================
+       DIALS
+       ========================= */
+
+    .dial {
+        width: 78px;
+        height: 78px;
+
+        margin: auto;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                #f1dfbb 0%,
+                #cba976 45%,
+                #79532e 48%,
+                #e1c08b 52%,
+                #704a28 100%
+            );
+
+        border: 4px solid #24150e;
+
+        box-shadow:
+            0 3px 5px #000,
+            inset 0 0 4px rgba(255,255,255,.7);
+
+        position: relative;
+    }
+
+    .dial::after {
+        content: "";
+
+        position: absolute;
+
+        width: 5px;
+        height: 25px;
+
+        background: #392116;
+
+        left: 50%;
+        top: 8px;
+
+        transform: translateX(-50%);
+
+        border-radius: 3px;
+    }
+
+    .dial-label {
+        text-align: center;
+
+        margin-top: 5px;
+
+        color: #d7b77d;
+
+        font-size: 8px;
+
+        letter-spacing: 2px;
+    }
+
+    /* =========================
+       RADIO FREQUENCY DISPLAY
+       ========================= */
+
+    .frequency {
+        height: 48px;
+
+        border: 3px solid #26150e;
+
+        background:
+            linear-gradient(
+                #60462e,
+                #201610
+            );
+
+        position: relative;
+
+        overflow: hidden;
+    }
+
+    .frequency::before {
+        content: "☕  LO-FI CAFÉ RADIO  ☕";
+
+        position: absolute;
+
+        width: 100%;
+
+        text-align: center;
+
+        top: 4px;
+
+        color: #d8bd86;
+
+        font-size: 10px;
+
+        letter-spacing: 2px;
+    }
+
+    .frequency-line {
+        position: absolute;
+
+        left: 5%;
+        right: 5%;
+
+        bottom: 9px;
+
+        height: 10px;
+
+        background:
+            repeating-linear-gradient(
+                90deg,
+                #bd9256 0px,
+                #bd9256 2px,
+                transparent 2px,
+                transparent 9px
+            );
+
+        opacity: .65;
+    }
+
+    /* =========================
+       SOUND BUTTONS
+       ========================= */
+
+    .sounds {
+        margin-top: 15px;
+
+        display: grid;
+
+        grid-template-columns: repeat(5, 1fr);
+
+        gap: 8px;
+    }
+
+    .sound {
+        text-align: center;
+
+        padding: 7px 4px;
+
+        background: #281812;
+
+        border: 1px solid #77502e;
+
+        box-shadow:
+            inset 0 1px #9c6c3d;
+    }
+
+    .sound button {
+        width: 100%;
+
+        border: 1px solid #9c7245;
+
+        background:
+            linear-gradient(
+                #e0c08b,
+                #a77b46
+            );
+
+        color: #2c170d;
+
+        font-family: Georgia, serif;
+
+        font-size: 10px;
+
+        padding: 7px 3px;
+
+        cursor: pointer;
+
+        box-shadow:
+            inset 0 1px rgba(255,255,255,.7),
+            0 2px #120b08;
+    }
+
+    .sound button:active {
+        transform: translateY(2px);
+
+        box-shadow:
+            inset 0 1px rgba(255,255,255,.7);
+    }
+
+    .sound button.active {
+        background:
+            linear-gradient(
+                #9c6a36,
+                #70451f
+            );
+
+        color: #ffe5ad;
+    }
+
+    .sound-name {
+        margin-top: 5px;
+
+        color: #c6a36d;
+
+        font-size: 8px;
+
+        letter-spacing: 1px;
+    }
+
+    /* =========================
+       VOLUME SLIDERS
+       ========================= */
+
+    .volume {
+        width: 100%;
+
+        margin-top: 6px;
+
+        accent-color: #c39759;
+
+        cursor: pointer;
+    }
+
+    /* =========================
+       MASTER CONTROL
+       ========================= */
+
+    .master {
+        margin-top: 13px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 10px;
+
+        color: #d5b57d;
+
+        font-size: 9px;
+
+        letter-spacing: 2px;
+    }
+
+    .master input {
+        width: 130px;
+
+        accent-color: #c39759;
+    }
+
+    /* =========================
+       RADIO BRANDING
+       ========================= */
+
+    .branding {
+        margin-top: 15px;
+
+        text-align: center;
+
+        color: #c19a5e;
+
+        font-size: 9px;
+
+        letter-spacing: 5px;
+
+        text-shadow: 1px 1px #1d0c07;
+    }
+
+    /* =========================
+       BOTTOM FEET
+       ========================= */
+
+    .feet {
+        display: flex;
+
+        justify-content: space-between;
+
+        margin: 0 45px;
+
+        transform: translateY(24px);
+    }
+
+    .foot {
+        width: 70px;
+        height: 15px;
+
+        background: #20130e;
+
+        transform: skewX(-20deg);
+
+        box-shadow: 0 5px 4px rgba(0,0,0,.4);
+    }
+
+    /* =========================
+       MOBILE
+       ========================= */
+
+    @media (max-width: 650px) {
+
+        .radio {
+            padding: 23px 18px 20px;
+        }
+
+        .speaker {
+            height: 220px;
+        }
+
+        .dial-row {
+            grid-template-columns: 75px 1fr 75px;
+            gap: 5px;
+        }
+
+        .dial {
+            width: 58px;
+            height: 58px;
+        }
+
+        .sounds {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .sound:last-child {
+            grid-column: span 2;
+        }
+
+        .radio-title {
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="radio">
+
+    <!-- =========================
+         IMAGE / GIF
+         ========================= -->
+
+    <div class="speaker-frame">
+
+        <div class="speaker">
+
+            <div
+                class="cafe-image"
+                id="cafeImage">
+            </div>
+
+            <div class="radio-title">
+                MIDNIGHT CAFÉ
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RADIO CONTROL PANEL
+         ========================= -->
+
+    <div class="panel">
+
+        <div class="dial-row">
+
+            <div>
+                <div class="dial"></div>
+                <div class="dial-label">VOLUME</div>
+            </div>
+
+
+            <div class="frequency">
+
+                <div class="frequency-line"></div>
+
+            </div>
+
+
+            <div>
+                <div class="dial"></div>
+                <div class="dial-label">TUNING</div>
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             SOUND MIXER
+             ========================= -->
+
+        <div class="sounds">
+
+
+            <!-- LOFI MUSIC -->
+
+            <div class="sound">
+
+                <button
+                    onclick="toggleSound('lofi', this)">
+                    ▶ LOFI
+                </button>
+
+                <div class="sound-name">
+                    MUSIC
+                </div>
+
+                <input
+                    class="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.35"
+                    oninput="setVolume('lofi', this.value)"
+                >
+
+            </div>
+
+
+            <!-- COFFEE -->
+
+            <div class="sound">
+
+                <button
+                    onclick="toggleSound('coffee', this)">
+                    ▶ BREW
+                </button>
+
+                <div class="sound-name">
+                    COFFEE
+                </div>
+
+                <input
+                    class="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.5"
+                    oninput="setVolume('coffee', this.value)"
+                >
+
+            </div>
+
+
+            <!-- RAIN -->
+
+            <div class="sound">
+
+                <button
+                    onclick="toggleSound('rain', this)">
+                    ▶ RAIN
+                </button>
+
+                <div class="sound-name">
+                    RAIN
+                </div>
+
+                <input
+                    class="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.4"
+                    oninput="setVolume('rain', this.value)"
+                >
+
+            </div>
+
+
+            <!-- CHATTER -->
+
+            <div class="sound">
+
+                <button
+                    onclick="toggleSound('chat', this)">
+                    ▶ CHAT
+                </button>
+
+                <div class="sound-name">
+                    PEOPLE
+                </div>
+
+                <input
+                    class="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.25"
+                    oninput="setVolume('chat', this.value)"
+                >
+
+            </div>
+
+
+            <!-- STIRRING -->
+
+            <div class="sound">
+
+                <button
+                    onclick="toggleSound('stir', this)">
+                    ▶ STIR
+                </button>
+
+                <div class="sound-name">
+                    CUP
+                </div>
+
+                <input
+                    class="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.3"
+                    oninput="setVolume('stir', this.value)"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- MASTER VOLUME -->
+
+        <div class="master">
+
+            <span>MASTER</span>
+
+            <input
+                id="masterVolume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.7"
+                oninput="updateMaster(this.value)"
+            >
+
+            <span id="masterValue">70%</span>
+
+        </div>
+
+    </div>
+
+
+    <div class="branding">
+        LO-FI • COFFEE • RAIN • NIGHT
+    </div>
+
+
+    <div class="feet">
+
+        <div class="foot"></div>
+        <div class="foot"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     AUDIO FILES
+     =====================================================
+
+     PUT YOUR AUDIO FILES HERE.
+
+     Example:
+
+     src="audio/rain.mp3"
+
+     If your GitHub repository has:
+
+     /index.html
+     /audio/
+         rain.mp3
+         coffee.mp3
+         chat.mp3
+         stir.mp3
+         lofi.mp3
+
+     then use:
+
+     audio/rain.mp3
+
+     ===================================================== -->
+
+<audio id="lofi" loop>
+    <source src="audio/lofi.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="coffee" loop>
+    <source src="audio/coffee.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="rain" loop>
+    <source src="audio/rain.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="chat" loop>
+    <source src="audio/chat.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="stir" loop>
+    <source src="audio/stir.mp3" type="audio/mpeg">
+</audio>
+
+
+<script>
+
+    /* =========================
+       AUDIO OBJECTS
+       ========================= */
+
+    const sounds = {
+        lofi: document.getElementById("lofi"),
+        coffee: document.getElementById("coffee"),
+        rain: document.getElementById("rain"),
+        chat: document.getElementById("chat"),
+        stir: document.getElementById("stir")
+    };
+
+
+    /* =========================
+       INITIAL VOLUMES
+       ========================= */
+
+    sounds.lofi.volume = 0.35;
+    sounds.coffee.volume = 0.50;
+    sounds.rain.volume = 0.40;
+    sounds.chat.volume = 0.25;
+    sounds.stir.volume = 0.30;
+
+
+    /* =========================
+       PLAY / PAUSE
+       ========================= */
+
+    function toggleSound(name, button) {
+
+        const audio = sounds[name];
+
+        if (audio.paused) {
+
+            audio.play().then(() => {
+
+                button.classList.add("active");
+
+                button.innerHTML =
+                    "■ " + name.toUpperCase();
+
+            }).catch(() => {
+
+                alert(
+                    "The audio file could not be played. " +
+                    "Check that the audio file exists."
+                );
+
+            });
+
+        } else {
+
+            audio.pause();
+
+            button.classList.remove("active");
+
+            button.innerHTML =
+                "▶ " + name.toUpperCase();
+        }
+    }
+
+
+    /* =========================
+       INDIVIDUAL VOLUME
+       ========================= */
+
+    function setVolume(name, value) {
+
+        sounds[name].volume =
+            parseFloat(value);
+    }
+
+
+    /* =========================
+       MASTER VOLUME
+       ========================= */
+
+    let masterVolume = 0.7;
+
+    function updateMaster(value) {
+
+        masterVolume =
+            parseFloat(value);
+
+        document.getElementById(
+            "masterValue"
+        ).textContent =
+            Math.round(masterVolume * 100) + "%";
+
+        Object.values(sounds).forEach(audio => {
+
+            audio.dataset.baseVolume =
+                audio.dataset.baseVolume ||
+                audio.volume;
+
+            audio.volume =
+                parseFloat(audio.dataset.baseVolume)
+                * masterVolume;
+
+        });
+    }
+
+</script>
+
+</body>
+</html>
